@@ -6,11 +6,16 @@ using UnityEngine.UI;
 
 public class MainManager : MonoBehaviour
 {
+    public static MainManager instance;
+
     public Brick BrickPrefab;
     public int LineCount = 6;
     public Rigidbody Ball;
 
     public Text ScoreText;
+    public Text secondScoreText;
+
+    public GameObject backToMenuText;
     public GameObject GameOverText;
     
     private bool m_Started = false;
@@ -18,7 +23,18 @@ public class MainManager : MonoBehaviour
     
     private bool m_GameOver = false;
 
-    
+    void Awake()
+    {
+        if (instance == null)
+        {
+            instance = this;
+        }
+        else 
+        {
+            Destroy(gameObject);
+        }
+    }
+
     // Start is called before the first frame update
     void Start()
     {
@@ -57,20 +73,38 @@ public class MainManager : MonoBehaviour
         {
             if (Input.GetKeyDown(KeyCode.Space))
             {
-                SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+                SceneManager.LoadScene(1);
+            }
+            else if (Input.GetKeyDown(KeyCode.E))
+            {
+                
+                SceneManager.LoadScene(0);
             }
         }
+
+        if (m_Points > DataPersistent.instance.bestPointsData)
+        {
+            DataPersistent.instance.bestPointsData = m_Points;
+            DataPersistent.instance.bestUserNameData = DataPersistent.instance.userNameData;
+            
+        }
+        secondScoreText.text = $"Best Score : {DataPersistent.instance.bestUserNameData} : {DataPersistent.instance.bestPointsData}";
+
     }
 
     void AddPoint(int point)
     {
         m_Points += point;
-        ScoreText.text = $"Score : {m_Points}";
+        DataPersistent.instance.pointsData = m_Points;
+        ScoreText.text = $"{DataPersistent.instance.userNameData}: {DataPersistent.instance.pointsData}";
+ 
     }
 
     public void GameOver()
     {
         m_GameOver = true;
         GameOverText.SetActive(true);
+        backToMenuText.SetActive(true);
+    
     }
 }
